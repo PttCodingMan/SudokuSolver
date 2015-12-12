@@ -3,7 +3,11 @@ package structure;
 public class Line implements Parent{
 	private Cell Cells[];
 	private boolean isColumnMode;
-	public Line(Cell inputCells[], boolean inputIsColumnMode){
+	private ContradictionStatus Status;
+	public Line(ContradictionStatus inputStatus){
+		Status = inputStatus;
+	}
+	public void setValue(Cell inputCells[], boolean inputIsColumnMode){
 		Cells = inputCells;
 		isColumnMode = inputIsColumnMode;
 		
@@ -30,8 +34,7 @@ public class Line implements Parent{
 		return result;
 	}
 	@Override
-	public void check() {
-		// TODO Auto-generated method stub
+	public void check(int intputValue) {
 		
 	}
 }

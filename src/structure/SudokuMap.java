@@ -44,7 +44,8 @@ public class SudokuMap implements Parent{
 			for(int x = 0 ; x < 9 ; x++){
 				temp[x] = Cells[ 9 * y + x];
 			}
-			Rows[y] = new Line(temp, false);
+			Rows[y] = new Line(Status);
+			Rows[y].setValue(temp, true);
 		}
 		
 		Columns = new Line[9];
@@ -53,7 +54,8 @@ public class SudokuMap implements Parent{
 			for(int y = 0 ; y < 9 ; y++){
 				temp[y] = Cells[ 9 * y + x];
 			}
-			Columns[x] = new Line(temp, true);
+			Columns[x] = new Line(Status);
+			Columns[x].setValue(temp, true);
 		}
 		
 		Jiugongges = new Jiugongge[3][3];
@@ -68,12 +70,19 @@ public class SudokuMap implements Parent{
 			}
 			
 			if(i % 3 == 2 ){
-				for(int t = 0 ; t < 3 ; t++){
-					Jiugongges[ i / 3 ][t] = new Jiugongge(CellTemp[t]);
+				for(int t = 0 ; t < 3 ; t++){//
+					Jiugongges[ i / 3 ][t] = new Jiugongge(Status);
+					Jiugongges[ i / 3 ][t].setValue(CellTemp[t]);
 				}
 			}
 		}
 		
+		for(int i = 0 ; i < 81 ; i++ ){
+			Cells[i].setValue(Integer.parseInt(data[i]));
+		}
+		
+		isEnable = !Status.getStatus();
+		System.out.println("isEnable = " + isEnable + " Status.getStatus() = " + Status.getStatus());
 //		Cells[25].setValue(1);
 //		
 //		for(int y = 0 ; y < 3 ; y++){
@@ -106,7 +115,7 @@ public class SudokuMap implements Parent{
 		}
 	}
 	@Override
-	public void check() {
+	public void check(int intputValue) {
 		if(Status.getStatus() == true) return;
 	}
 }

@@ -54,7 +54,7 @@ public class Cell {
 		
 		for(int i = 0 ; i < 3 ; i++){
 			if(Status.getStatus() == true) return;
-			if(Parent[i] != null) Parent[i].check();
+			if(Parent[i] != null) Parent[i].check(inputValue);
 		}
 	}
 	public int getValue(){

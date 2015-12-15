@@ -1,5 +1,5 @@
 package structure;
 
-public interface Parent {
+public interface checkParent {
 	public void check(int inputValue);
 }

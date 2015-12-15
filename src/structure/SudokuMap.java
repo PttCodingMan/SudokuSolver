@@ -7,6 +7,10 @@ public class SudokuMap implements checkParent,Runnable{
 	private Jiugongge Jiugongges[][];
 	private boolean isEnable;
 	private MapStatus Status;
+	
+	private int LastSetY;
+	private int LastSetX;
+	
 	public SudokuMap(String inputData){
 		isEnable = false;
 		Status = new MapStatus();
@@ -111,25 +115,31 @@ public class SudokuMap implements checkParent,Runnable{
 					return;
 				}
 				
-				Cells[y][x].setValue(Integer.parseInt(data[ 9 * y + x]));
+				//Cells[y][x].setValue(Integer.parseInt(data[ 9 * y + x]));
+				setCellValue(y, x, Cells[y][x], Integer.parseInt(data[ 9 * y + x]));
 			}
 		}	
 		
 		//System.out.println("isEnable = " + isEnable + " Status.getStatus() = " + Status.getStatus());
-		Cells[4][4].setValue(1);
-		
-		for(int y = 0 ; y < 3 ; y++){
-			for(int x = 0 ; x < 3 ; x++){
-				Jiugongges[y][x].show();
-				System.out.println();
-			}
-		}
-		for(int i = 0 ; i < 9 ; i++){
-			Rows[i].show();
-		}
-		for(int i = 0 ; i < 9 ; i++){
-			Columns[i].show();
-		}
+//		Cells[4][4].setValue(1);
+//		
+//		for(int y = 0 ; y < 3 ; y++){
+//			for(int x = 0 ; x < 3 ; x++){
+//				Jiugongges[y][x].show();
+//				System.out.println();
+//			}
+//		}
+//		for(int i = 0 ; i < 9 ; i++){
+//			Rows[i].show();
+//		}
+//		for(int i = 0 ; i < 9 ; i++){
+//			Columns[i].show();
+//		}
+	}
+	private void setCellValue(int y, int x, Cell inputCell, int inputValue){
+		LastSetY = y;
+		LastSetX = x;
+		inputCell.setValue(inputValue);
 	}
 	public boolean isEnable(){
 		return isEnable;
@@ -168,7 +178,9 @@ public class SudokuMap implements checkParent,Runnable{
 		for(int y = 0 ; y < 3 ; y++){
 			for(int x = 0 ; x < 3 ; x++){
 				if(Status.getFinishStatus() == true) return;
-				Jiugongges[y][x].check(inputValue);
+				if((LastSetY / 3) == y || (LastSetX / 3) == x){
+					Jiugongges[y][x].check(inputValue);
+				}
 			}
 		}
 	}

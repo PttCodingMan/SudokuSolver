@@ -18,7 +18,10 @@ public class Main {
 		//String testString = "006400005\n030006900\n009050010\n020001804\n900000002\n708900030\n040090200\n007600080\n600002300";
 		
 		//Hard problem, need to compute
-		String testString = "006000100920075600030800040390400000000000000000007054060009020005730069009000400";
+		//String testString = "006000100920075600030800040390400000000000000000007054060009020005730069009000400";
+		
+		//Hardest problem in the world
+		String testString = "800000000003600000070090200050007000000045700000100030001000068008500010090000400";
 		
 		SudokuMap map = new SudokuMap(testString);
 		if(!map.isEnable()){
@@ -29,7 +32,14 @@ public class Main {
 		}
 		map.show();
 		map.calculate(false);
+		if(!map.isEnable()){
+			System.out.println("calculate status: Fail");
+		}
+		else{
+			System.out.println("calculate status: Success");
+		}
 		map.show();
+		System.out.println("Total time: " + map.getExecutionTime() + " Microseconds");
 	}
 
 }

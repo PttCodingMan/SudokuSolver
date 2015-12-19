@@ -12,6 +12,8 @@ public class SudokuMap implements checkParent,Runnable{
 	
 	private String originData[];
 	
+	private long time;
+	
 	private int LastSetY;
 	private int LastSetX;
 	
@@ -265,14 +267,12 @@ public class SudokuMap implements checkParent,Runnable{
 //		in other words, it finds an answer!
 		
 		if(MinSize == Integer.MAX_VALUE){
+			
 			OriginState.setFinishStatus(true);
 			OriginState.setAnswer(this);
 			return;
+			
 		}
-		
-//		System.out.println("MinSize = " + MinSize);
-//		show();
-//		System.out.println("MinSize = " + MinSize);
 
 		SudokuMap tempMap[] = new SudokuMap[MinSize];
 		
@@ -288,15 +288,17 @@ public class SudokuMap implements checkParent,Runnable{
 			
 			tempMap[index].setCellValue(tempY, tempX, inputValue);
 			
-			if(!tempMap[index].isEnable()) continue;
-			else if(OriginState.getFinishStatus()) break;
-			else {
-//				System.out.println("tempY = " + tempY);
-//				System.out.println("tempX = " + tempX);
-//				System.out.println("inputValue = " + inputValue);
+			if(OriginState.getFinishStatus()){
 				
-				tempMap[index].RecursiveCalculate(OriginState, threadLevel - 1);
+				return;
+				
 			}
+			else if(tempMap[index].isEnable()){
+								
+				tempMap[index].RecursiveCalculate(OriginState, threadLevel - 1);
+				
+			}
+			
 			index++;
 		}
 	}
@@ -308,7 +310,11 @@ public class SudokuMap implements checkParent,Runnable{
 		
 		int ThreadLevel = useThread ? 3 : 0;
 		
+		time = System.nanoTime();
+		
 		RecursiveCalculate(Status, ThreadLevel);
+		
+		time = System.nanoTime() - time;
 		
 		if(Status.getFinishStatus()){
 			
@@ -323,6 +329,9 @@ public class SudokuMap implements checkParent,Runnable{
 			}
 		}
 		
+	}
+	public long getExecutionTime(){
+		return time/1000000;
 	}
 	@Override
 	public void run() {

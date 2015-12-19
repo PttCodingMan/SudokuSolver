@@ -40,7 +40,7 @@ public class Line implements updateParent, checkParent{
 	@Override
 	public void check(int inputValue) {
 		
-		if(Status.getFinishStatus()) return;
+		if(Status.getWrongStatus()) return;
 		
 		//Start of checking repeat
 		
@@ -55,7 +55,7 @@ public class Line implements updateParent, checkParent{
 				CheckList.remove(Cells[i].getValue());
 			}
 			else{
-				Status.setFinishStatus(true);
+				Status.setWrongStatus(true);
 				return;
 			}
 			
@@ -88,7 +88,7 @@ public class Line implements updateParent, checkParent{
 		
 		for(int i = 1 ; i < 10 ; i++ ){
 			
-			if(Status.getFinishStatus()) return;
+			if(Status.getWrongStatus()) return;
 			else if(CheckArray[i] == 1){
 				
 				for(int t = 0 ; t < 9 ; t++ ){
@@ -110,7 +110,7 @@ public class Line implements updateParent, checkParent{
 		
 		for(int i = 0 ; i < 9 ; i++ ){
 			
-			if(Status.getFinishStatus() == true) return;
+			if(Status.getWrongStatus() == true) return;
 			Cells[i].removeCandidateNumber(inputValue);
 			
 		}

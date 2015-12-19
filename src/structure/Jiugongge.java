@@ -46,7 +46,7 @@ public class Jiugongge implements updateParent, checkParent{
 					CheckList.remove(Cells[y][x].getValue());
 				}
 				else{
-					Status.setFinishStatus(true);
+					Status.setWrongStatus(true);
 					return;
 				}
 				
@@ -89,7 +89,7 @@ public class Jiugongge implements updateParent, checkParent{
 		for(int y = 0 ; y < 3 ; y++){
 			for(int x = 0 ; x < 3 ; x++){
 				
-				if(Status.getFinishStatus() == true) return;
+				if(Status.getWrongStatus() == true) return;
 				Cells[y][x].removeCandidateNumber(inputValue);
 				
 			}

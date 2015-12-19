@@ -25,7 +25,7 @@ public class Cell {
 		UpdateParent.add(inputParent);
 		if(UpdateParent.size() > 3){
 			System.out.println("Parent Size > 3 !");
-			Status.setFinishStatus(true);
+			Status.setWrongStatus(true);
 			return;
 		}
 	}
@@ -42,8 +42,7 @@ public class Cell {
 	}
 	public void removeCandidateNumber(int inputValue){
 		CandidateNumbers.remove(inputValue);
-		
-		
+				
 //		If the value of this cell is DafaultNullNumber
 //		and the number of candidateNumbers is the only one choice then the value will be the number
 //		
@@ -53,8 +52,8 @@ public class Cell {
 		
 		if(Value != DafaultNullNumber) return;
 		
-		if(CandidateNumbers.size() == 1) Value = (int) CandidateNumbers.toArray()[0];
-		else if(CandidateNumbers.size() == 0) Status.setFinishStatus(true);
+		if(CandidateNumbers.size() == 1) setValue((int) CandidateNumbers.toArray()[0]);
+		else if(CandidateNumbers.size() == 0) Status.setWrongStatus(true);
 		
 	}
 	public void setValue(int inputValue){
@@ -72,7 +71,7 @@ public class Cell {
 		CandidateNumbers.clear();
 		
 		for(int i = 0 ; i < 3 ; i++){
-			if(Status.getFinishStatus() == true) return;
+			if(Status.getWrongStatus() == true) return;
 			UpdateParent.get(i).update(inputValue);
 		}
 		

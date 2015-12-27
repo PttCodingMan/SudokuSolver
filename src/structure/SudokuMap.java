@@ -3,6 +3,7 @@ package structure;
 import java.util.HashSet;
 import java.util.Iterator;
 
+
 public class SudokuMap implements checkParent,Runnable{
 	private Cell Cells[][];
 	private Line Rows[];

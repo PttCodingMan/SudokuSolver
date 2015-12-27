@@ -4,26 +4,26 @@ It's pretty fast and easy to use.
 
 You can get a quickstart in the following code.
 
-    String testString = "800000000003600000070090200050007000000045700000100030001000068008500010090000400";
+    	String testString = "800000000003600000070090200050007000000045700000100030001000068008500010090000400";
 
-    SudokuMap map = new SudokuMap(testString);
+    	SudokuMap map = new SudokuMap(testString);
 		
-		boolean useThread = false;
+	boolean useThread = false;
 		
-		map.show();
+	map.show();
 		
-		map.calculate(useThread);
+	map.calculate(useThread);
 		
-		if(map.isFinish()){
-			System.out.println("Calculate finish!");
-		}
-		else{
-			System.out.println("Calculate not finish!");
-			System.out.println("Something wrong!");
-		}
-		map.show();
-		
-		int result[] = map.getAnswer(); //Get the answer!
+	if(map.isFinish()){
+		System.out.println("Calculate finish!");
+	}
+	else{
+		System.out.println("Calculate not finish!");
+		System.out.println("Something wrong!");
+	}
+	map.show();
+	
+	int result[][] = TestMap.getAnswer(); //Get the 9x9 answer!
 
 Then you can get the following output.
 

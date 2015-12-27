@@ -21,6 +21,8 @@ You can get a quickstart in the following code.
 			System.out.println("Something wrong!");
 		}
 		map.show();
+		
+		int result[] = map.getAnswer(); //Get the answer!
 
 Then you can get the following output.
 

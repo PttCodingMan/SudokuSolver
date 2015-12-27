@@ -1,5 +1,5 @@
 package structure;
 
-public interface updateParent {
-	public void update(int inputValue);
+interface updateParent {
+	void update(int inputValue);
 }

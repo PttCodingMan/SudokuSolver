@@ -7,12 +7,12 @@ import java.util.Set;
 public class Jiugongge implements updateParent, checkParent{
 	private Cell Cells[][];
 	private MapStatus Status;
-	public Jiugongge(MapStatus inputStatus){
+	protected Jiugongge(MapStatus inputStatus){
 		
 		Status = inputStatus;
 		
 	}
-	public void setValue(Cell inputCells[][]){
+	protected void setValue(Cell inputCells[][]){
 		
 		Cells = inputCells;
 		for(int y = 0 ; y < 3 ; y++){
@@ -22,7 +22,7 @@ public class Jiugongge implements updateParent, checkParent{
 		}
 		
 	}
-	public void show(){
+	protected void show(){
 		for(int y = 0 ; y < 3 ; y++){
 			for(int x = 0 ; x < 3 ; x++){
 				System.out.print(" " + Cells[y][x].toString());
@@ -31,7 +31,11 @@ public class Jiugongge implements updateParent, checkParent{
 		}
 	}
 	@Override
-	public void check(int inputValue) {
+	public boolean check() {
+		
+		if(Status.getWrongStatus()) return false;
+		
+		boolean isChanged = false;
 		
 		//Start of checking repeat
 		Set<Integer> CheckList = new HashSet<Integer>();
@@ -40,14 +44,16 @@ public class Jiugongge implements updateParent, checkParent{
 		for(int y = 0 ; y < 3 ; y++){
 			for(int x = 0 ; x < 3 ; x++){
 				
-				if(Cells[y][x].getValue() == 0) continue;
+				int ValueTemp = Cells[y][x].getValue();
 				
-				if(CheckList.contains(Cells[y][x].getValue())){
-					CheckList.remove(Cells[y][x].getValue());
+				if(ValueTemp == 0) continue;
+				
+				if(CheckList.contains(ValueTemp)){
+					CheckList.remove(ValueTemp);
 				}
 				else{
-					Status.setWrongStatus(true);
-					return;
+					Status.setWrongStatus(ErrorCode.ValueRepeat);
+					return false;
 				}
 				
 			}
@@ -55,11 +61,9 @@ public class Jiugongge implements updateParent, checkParent{
 		//End of checking repeat
 		
 		//Start of checking the only one choice
-		int CheckArray[] = new int[10];
+		int CheckValueArray[] = new int[10];
 		
-		for(int i = 0 ; i < 10 ; i++){
-			CheckArray[i] = 0;
-		}
+		for(int i = 0 ; i < 10 ; i++) CheckValueArray[i] = 0;
 		
 		for(int y = 0 ; y < 3 ; y++){
 			for(int x = 0 ; x < 3 ; x++){
@@ -69,12 +73,31 @@ public class Jiugongge implements updateParent, checkParent{
 				if(CellValueTemp == 0){
 					Iterator<Integer> NumberIterator = Cells[y][x].getCandidateNumberSet().iterator();
 					while(NumberIterator.hasNext()){
+						
 						int tmp = NumberIterator.next();
-						CheckArray[tmp]++;
+						CheckValueArray[tmp]++;
+						
 					}
 				}
-				else {
-					CheckArray[CellValueTemp]++;
+				
+			}
+		}
+		
+		for(int i = 1 ; i < 10 ; i++ ){
+			
+			if(CheckValueArray[i] == 1){
+				
+				for(int y = 0 ; y < 3 ; y++){
+					for(int x = 0 ; x < 3 ; x++){
+						if(Cells[y][x].getCandidateNumberSet().contains(i)){
+							
+							Cells[y][x].setValue(i, true);
+							
+							isChanged = true;
+							y = 3;
+							x = 3;
+						}
+					}
 				}
 				
 			}
@@ -82,14 +105,14 @@ public class Jiugongge implements updateParent, checkParent{
 		
 		//End of checking the only one choice
 		
+		return isChanged;
 	}
 	@Override
 	public void update(int inputValue) {
 		
 		for(int y = 0 ; y < 3 ; y++){
 			for(int x = 0 ; x < 3 ; x++){
-				
-				if(Status.getWrongStatus() == true) return;
+
 				Cells[y][x].removeCandidateNumber(inputValue);
 				
 			}

@@ -1,25 +1,23 @@
 package structure;
 
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 public class SudokuMap implements checkParent,Runnable{
 	private Cell Cells[][];
 	private Line Rows[];
 	private Line Columns[];
 	private Jiugongge Jiugongges[][];
-	private boolean isEnable;
 	private MapStatus Status;
 	
 	private String originData[];
 	
-	private long time;
-	
 	private int LastSetY;
 	private int LastSetX;
 	
-	public SudokuMap(SudokuMap OriginMap){
-		isEnable = false;
-		Status = new MapStatus();
+	private SudokuMap(SudokuMap OriginMap, MapStatus inputStatus){
+		Status = inputStatus;		
 		
 		String inputData = "";
 		int values[][] = OriginMap.getValues();
@@ -31,81 +29,112 @@ public class SudokuMap implements checkParent,Runnable{
 		
 		String data[] = processInputData(inputData);
 		
-		if(data == null || (!isEnable) ) return ;
+		if(data == null || Status.getWrongStatus() ) return ;
 		
 		initStructure();
 		
 		originData = data;
 		
-		setDataToCell();
+		setDataToCell(true);
+		
+//		HashSet<Integer> TempCandidateNumbers[][] = getCandidateNumbers();
+//		setCandidateNumbers(TempCandidateNumbers);
+		
 	}
 	public SudokuMap(String inputData){
-		isEnable = false;
 		Status = new MapStatus();
 		
 		String data[] = processInputData(inputData);
 		
-		if(data == null || (!isEnable) ) return ;
+		if(data == null || Status.getWrongStatus() ) return ;
 		
 		initStructure();
 		
 		originData = data;
+
 	}
-	private void setDataToCell(){
+	private void setDataToCell(boolean needUpdate){
 		
 		for(int y = 0 ; y < 9 ; y++){
 			for(int x = 0 ; x < 9 ; x++ ){
 				
-				if(Status.getWrongStatus() == true) {
-					isEnable = false;
+				setCellValue(y, x, Integer.parseInt(originData[ 9 * y + x]), needUpdate);
+				
+				if(Status.getWrongStatus()) {
+					originData = null;
 					return;
+					
 				}
-
-				setCellValue(y, x, Cells[y][x], Integer.parseInt(originData[ 9 * y + x]));
+			}
+		}
+		originData = null;
+	}
+	private HashSet<Integer>[][] getCandidateNumbers(){
+		
+		HashSet<Integer> result[][] = new HashSet[9][9];
+		
+		for(int y = 0 ; y < 9 ; y++){
+			for(int x = 0 ; x < 9 ; x++ ){
+				
+				result[y][x] = Cells[y][x].getCandidateNumberSet();
+				
 			}
 		}
 		
-		originData = null;
+		return result;
 	}
+	
+	private void setCandidateNumbers(HashSet<Integer>[][] inputCandidateNumbers){
+		
+		for(int y = 0 ; y < 9 ; y++){
+			for(int x = 0 ; x < 9 ; x++ ){
+				
+				Cells[y][x].setCandidateNumberSet(inputCandidateNumbers[y][x]);
+				
+			}
+		}
+
+	}
+
 	private String[] processInputData(String inputData){
 		while(inputData.contains("  ")) inputData = inputData.replaceAll("  ", " ");
 		while(inputData.contains("\n")) inputData = inputData.replaceAll("\n", "");
 		while(inputData.contains("\r")) inputData = inputData.replaceAll("\r", "");
 		
 		String data[] = inputData.split(" ");
-		if(data.length == 81){
-			
-			checkNumber(data);
-			
-		}
-		else if(data.length == 1){
+		
+		if(data.length == 1){
 			
 			data = inputData.split("");
-
-			checkNumber(data);
 			
 		}
-		else{
+		if(data.length != 81){
 			System.out.println("the input value can't translate to SudokuMap");
+			Status.setWrongStatus(ErrorCode.ValueLENNOT81);
 			return null;
 		}
+		checkNumber(data);
 		
-		isEnable = !Status.getWrongStatus();
+		if(Status.getWrongStatus()) return null;
 		
 		return data;
 	}
 	private void checkNumber(String[] inputData){
+		if(inputData.length != 81){
+			Status.setWrongStatus(ErrorCode.ValueLENNOT81);
+			return;
+		}
 		for(int i = 0 ; i < 81 ; i++ ){
 			try{
 				if( -1 > Integer.parseInt(inputData[i]) || Integer.parseInt(inputData[i]) > 9){
 					System.out.println("the values is not between 0~9");
-					Status.setWrongStatus(true);
+					Status.setWrongStatus(ErrorCode.ValueCouldNotbetween19);
 					return;
 				}
 			}
 			catch(NumberFormatException e){
 				System.out.println("The values can not be converted into 0~9");
-				Status.setWrongStatus(true);
+				Status.setWrongStatus(ErrorCode.ValueCouldNotbetween19);
 				return;
 			}
 		}
@@ -115,7 +144,7 @@ public class SudokuMap implements checkParent,Runnable{
 		Cells = new Cell[9][9];
 		for(int y = 0 ; y < 9 ; y++ ){
 			for(int x = 0 ; x < 9 ; x++ ){
-				Cells[y][x] = new Cell(Status);
+				Cells[y][x] = new Cell(Status, y, x);
 				Cells[y][x].setCheckParent(this);
 			}
 		}
@@ -159,7 +188,7 @@ public class SudokuMap implements checkParent,Runnable{
 			}
 		}
 	}
-	public int[][] getValues(){
+	private int[][] getValues(){
 		int result[][] = new int[9][9];
 		for(int y = 0 ; y < 9 ; y++){
 			for(int x = 0 ; x < 9 ; x++){
@@ -168,24 +197,29 @@ public class SudokuMap implements checkParent,Runnable{
 		}
 		return result;
 	}
-	protected void setCellValue(int y, int x, int inputValue){
-		setCellValue(y, x, Cells[y][x], inputValue);
-	}
-	private void setCellValue(int y, int x, Cell inputCell, int inputValue){
+	
+	private void setCellValue(int y, int x, int inputValue, boolean needUpdate){
+		
 		LastSetY = y;
 		LastSetX = x;
-		inputCell.setValue(inputValue);
-	}
-	public static SudokuMap copyMap(SudokuMap becopyMap){
+		Cells[y][x].setValue(inputValue, needUpdate);
 		
-		SudokuMap result = new SudokuMap(becopyMap);
+	}
+	
+	private SudokuMap copyMap(MapStatus inputStatus){
+		
+		SudokuMap result = new SudokuMap(this, inputStatus);
 		return result;
 		
 	}
 	public boolean isEnable(){
-		return isEnable && (!Status.getWrongStatus());
+		return !Status.getWrongStatus();
+	}
+	public boolean isFinish(){
+		return Status.getFinishStatus();
 	}
 	public void show(){
+		if(Status.getErrorCode() == ErrorCode.ValueCouldNotbetween19 || Status.getErrorCode() == ErrorCode.ValueLENNOT81) return;
 		//String line = " - - - - - - - - - - - - - - -";
 		boolean showCell = false;
 		
@@ -218,32 +252,61 @@ public class SudokuMap implements checkParent,Runnable{
 		}
 	}
 	@Override
-	public void check(int inputValue) {
-		if(Status.getWrongStatus() == true) return;
+	public boolean check() {
 		
-		for(int i = 0 ; i < 9 ; i++){
-			if(Status.getWrongStatus() == true) return;
-			Rows[i].check(inputValue);
-		}
-		
-		for(int i = 0 ; i < 9 ; i++){
-			if(Status.getWrongStatus() == true) return;
-			Columns[i].check(inputValue);
-		}
-		
-		for(int y = 0 ; y < 3 ; y++){
-			for(int x = 0 ; x < 3 ; x++){
-				if(Status.getWrongStatus() == true) return;
-				if((LastSetY / 3) == y || (LastSetX / 3) == x){
-					Jiugongges[y][x].check(inputValue);
+		boolean isUpdated = false;
+		do{
+			
+			isUpdated = false;
+			
+			for(int y = 0 ; y < 9 ; y++){
+				for(int x = 0 ; x < 9 ; x++){
+					
+					if(Cells[y][x].getValue() != 0) continue;
+					
+					HashSet<Integer> sizeTemp = Cells[y][x].getCandidateNumberSet();
+					
+					if(sizeTemp.size() == 1){
+						
+						int InputValueTemp = sizeTemp.iterator().next();
+						
+						Cells[y][x].setValue(InputValueTemp, true);
+						
+						isUpdated = true;
+					}
+					
 				}
 			}
-		}
+			
+			if(isUpdated) continue;
+				
+			for(int i = 0 ; i < 9 ; i++ ){
+				
+				boolean isRowChange = Rows[i].check();
+				
+				isUpdated = isUpdated || isRowChange;
+			}
+			
+			if(isUpdated) continue;
+			
+			for(int i = 0 ; i < 9 ; i++ ){
+				
+				boolean isColumnsChange = Columns[i].check();
+				
+				isUpdated = isUpdated || isColumnsChange;
+			}
+			
+		}while(isUpdated);
+		
+		return false;
 	}
-	private void RecursiveCalculate(MapStatus OriginState, int threadLevel){
+	private void RecursiveCalculate(){
 		
 		int tempX = 0, tempY = 0;
 		int MinSize = Integer.MAX_VALUE;
+		
+		check();
+		
 		for(int y = 0 ; y < 9 ; y++){
 			for(int x = 0 ; x < 9 ; x++){
 				
@@ -265,59 +328,91 @@ public class SudokuMap implements checkParent,Runnable{
 //		If MinSize == Integer.MAX_VALUE,
 //		it means this SudokuMap has not find any empty cell
 //		in other words, it finds an answer!
-		
+
 		if(MinSize == Integer.MAX_VALUE){
 			
-			OriginState.setFinishStatus(true);
-			OriginState.setAnswer(this);
+			Status.setFinishStatus();
+			Status.setAnswer(this);
+			
 			return;
 			
 		}
 
 		SudokuMap tempMap[] = new SudokuMap[MinSize];
+		MapStatus tempStatus[] = new MapStatus[MinSize];
+		Thread tempThread[] = new Thread[MinSize];
 		
 		for(int i = 0 ; i < MinSize ; i++){
-			tempMap[i] = SudokuMap.copyMap(this);
+			
+			tempStatus[i] = new MapStatus();
+			tempMap[i] = copyMap(tempStatus[i]);
+			tempThread[i] = new Thread(tempMap[i]);
+		
 		}		
 		
 		Iterator<Integer> iterator = Cells[tempY][tempX].getCandidateNumberSet().iterator();
 		
-		int index = 0;
-		while(iterator.hasNext()){
+		
+		for(int index = 0; iterator.hasNext(); index++){
 			int inputValue = iterator.next();
 			
-			tempMap[index].setCellValue(tempY, tempX, inputValue);
+			tempMap[index].setCellValue(tempY, tempX, inputValue, true);
 			
-			if(OriginState.getFinishStatus()){
+			if(!tempMap[index].isEnable()) continue;
+				
+			if(!Status.getUseThread()){
+				tempMap[index].RecursiveCalculate();
+				
+				if(!tempStatus[index].getFinishStatus()) continue;
+					
+				Status.setFinishStatus();
+				Status.setAnswer(tempStatus[index].getAnswer());
+				
+				return;
+			}
+			else{
+				
+				tempThread[index].start();
+				
+			}
+			
+		}
+		if(!Status.getUseThread()) return ;
+		for(int i = 0 ; i < MinSize ; i++ ){
+			
+			try {
+				tempThread[i].join();
+			} catch (InterruptedException e) {e.printStackTrace();}
+			
+			if(tempStatus[i].getFinishStatus()){
+				
+				Status.setFinishStatus();
+				Status.setAnswer(tempStatus[i].getAnswer());
 				
 				return;
 				
 			}
-			else if(tempMap[index].isEnable()){
-								
-				tempMap[index].RecursiveCalculate(OriginState, threadLevel - 1);
-				
-			}
 			
-			index++;
 		}
-	}
-	public void calculate(boolean useThread){
 		
-		setDataToCell();
+	}
+	public int getErrorCode(){
+		return Status.getErrorCode();
+	}
+	public void calculate(boolean inputUseThread){
 		
 		if(Status.getWrongStatus()) return;
 		
-		int ThreadLevel = useThread ? 3 : 0;
+		setDataToCell(true);
 		
-		time = System.nanoTime();
+		if(Status.getWrongStatus()) return;
 		
-		RecursiveCalculate(Status, ThreadLevel);
+		Status.setUseThread(inputUseThread);
 		
-		time = System.nanoTime() - time;
+		RecursiveCalculate();
 		
 		if(Status.getFinishStatus()){
-			
+
 			originData = new String[81];
 			int CellTemp[][] = Status.getAnswer().getValues();
 			for(int y = 0 ; y < 9 ; y++){
@@ -330,12 +425,8 @@ public class SudokuMap implements checkParent,Runnable{
 		}
 		
 	}
-	public long getExecutionTime(){
-		return time/1000000;
-	}
 	@Override
 	public void run() {
-		// TODO Auto-generated method stub
-		
+		RecursiveCalculate();
 	}
 }

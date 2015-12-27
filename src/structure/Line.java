@@ -2,16 +2,15 @@ package structure;
 
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Set;
 
 public class Line implements updateParent, checkParent{
 	private Cell Cells[];
 	private boolean isColumnMode;
 	private MapStatus Status;
-	public Line(MapStatus inputStatus){
+	protected Line(MapStatus inputStatus){
 		Status = inputStatus;
 	}
-	public void setValue(Cell inputCells[], boolean inputIsColumnMode){
+	protected void setValue(Cell inputCells[], boolean inputIsColumnMode){
 		Cells = inputCells;
 		isColumnMode = inputIsColumnMode;
 		
@@ -19,14 +18,14 @@ public class Line implements updateParent, checkParent{
 			Cells[i].setUpdateParent(this);
 		}
 	}
-	public void show(){
+	protected void show(){
 		for(int i = 0 ; i < 9 ; i++ ){
 			System.out.print(" " + Cells[i].toString());
 			if(isColumnMode) System.out.print("\n");  
 		}
 		System.out.print("\n");
 	}
-	public Cell[] getPart(int inputPart){ 
+	protected Cell[] getPart(int inputPart){ 
 		//0 TOP 3 
 		//1 min 3
 		//2 Last 3
@@ -38,25 +37,29 @@ public class Line implements updateParent, checkParent{
 		return result;
 	}
 	@Override
-	public void check(int inputValue) {
+	public boolean check() {
 		
-		if(Status.getWrongStatus()) return;
+		if(Status.getWrongStatus()) return false;
+		
+		boolean isChanged = false;
 		
 		//Start of checking repeat
 		
-		Set<Integer> CheckList = new HashSet<Integer>();
-		for(int i = 0 ; i < 9 ; i++ ) CheckList.add(i+1);
+		HashSet<Integer> CheckList = new HashSet<Integer>();
+		for(int i = 1 ; i <= 9 ; i++ ) CheckList.add(i);
 		
 		for(int i = 0 ; i < 9 ; i++ ){
 			
-			if(Cells[i].getValue() == 0) continue;
+			int ValueTemp = Cells[i].getValue();
 			
-			if(CheckList.contains(Cells[i].getValue())){
-				CheckList.remove(Cells[i].getValue());
+			if(ValueTemp == 0) continue;
+			
+			if(CheckList.contains(ValueTemp)){
+				CheckList.remove(ValueTemp);
 			}
 			else{
-				Status.setWrongStatus(true);
-				return;
+				Status.setWrongStatus(ErrorCode.ValueRepeat);
+				return false;
 			}
 			
 		}
@@ -64,10 +67,10 @@ public class Line implements updateParent, checkParent{
 		//End of checking repeat
 		
 		//Start of checking the only one in group
-		int CheckArray[] = new int[10];
+		int CheckValueArray[] = new int[10];
 		
 		for(int i = 0 ; i < 10 ; i++){
-			CheckArray[i] = 0;
+			CheckValueArray[i] = 0;
 		}
 		
 		for(int i = 0 ; i < 9 ; i++ ){
@@ -77,25 +80,23 @@ public class Line implements updateParent, checkParent{
 			if(CellValueTemp == 0){
 				Iterator<Integer> NumberIterator = Cells[i].getCandidateNumberSet().iterator();
 				while(NumberIterator.hasNext()){
+					
 					int tmp = NumberIterator.next();
-					CheckArray[tmp]++;
+					CheckValueArray[tmp]++;
+					
 				}
-			}
-			else {
-				CheckArray[CellValueTemp]++;
 			}
 		}
 		
 		for(int i = 1 ; i < 10 ; i++ ){
 			
-			if(Status.getWrongStatus()) return;
-			else if(CheckArray[i] == 1){
+			if(CheckValueArray[i] == 1){
 				
 				for(int t = 0 ; t < 9 ; t++ ){
 					if(Cells[t].getCandidateNumberSet().contains(i)){
 						
-						Cells[t].setValue(i);
-						
+						Cells[t].setValue(i, true);
+						isChanged = true;
 						break;
 					}
 				}
@@ -104,13 +105,13 @@ public class Line implements updateParent, checkParent{
 		}
 		//End of checking the only one in group
 		
+		return isChanged;
 	}
 	@Override
 	public void update(int inputValue) {
 		
 		for(int i = 0 ; i < 9 ; i++ ){
 			
-			if(Status.getWrongStatus() == true) return;
 			Cells[i].removeCandidateNumber(inputValue);
 			
 		}

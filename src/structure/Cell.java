@@ -6,78 +6,84 @@ import java.util.List;
 import java.util.Set;
 
 public class Cell {
-	private Set<Integer> CandidateNumbers;
+	private HashSet<Integer> CandidateNumbers;
 	private int Value;
 	private List<updateParent> UpdateParent;
 	private checkParent CheckParent;
 	private MapStatus Status;
 	
+	private int LocationX, LocationY;
 	static int DafaultNullNumber = 0; 
-	public Cell(MapStatus inputStatus){
+	protected Cell(MapStatus inputStatus, int y, int x){
 		CandidateNumbers = new HashSet<Integer>();
 		for(int i = 0 ; i < 9 ; i++ ) CandidateNumbers.add(i+1);
 		
 		UpdateParent = new ArrayList<updateParent>();
 		
 		Status = inputStatus;
+		
+		LocationX = x;
+		LocationY = y;
 	}
-	public void setUpdateParent(updateParent inputParent){
+	protected void setUpdateParent(updateParent inputParent){
 		UpdateParent.add(inputParent);
 		if(UpdateParent.size() > 3){
-			System.out.println("Parent Size > 3 !");
-			Status.setWrongStatus(true);
+			Status.setWrongStatus(ErrorCode.UpdataParentTooMany);
 			return;
 		}
 	}
 	
-	public void setCheckParent(checkParent inputParent){
+	protected void setCheckParent(checkParent inputParent){
 		CheckParent = inputParent;
 	}
 	
-	public Set<Integer> getCandidateNumberSet(){
-		return CandidateNumbers;
+	protected HashSet<Integer> getCandidateNumberSet(){
+		
+		return (HashSet<Integer>) CandidateNumbers.clone();
+		
 	}
-	public boolean containsCandidateNumber(int input){
+	
+	protected void setCandidateNumberSet(HashSet<Integer> inputCandidateNumberSet){
+		
+		CandidateNumbers = (HashSet<Integer>) inputCandidateNumberSet.clone();
+		
+	}
+	
+	protected boolean containsCandidateNumber(int input){
 		return CandidateNumbers.contains(input);
 	}
-	public void removeCandidateNumber(int inputValue){
-		CandidateNumbers.remove(inputValue);
-				
-//		If the value of this cell is DafaultNullNumber
-//		and the number of candidateNumbers is the only one choice then the value will be the number
-//		
-//		If the value of this cell is DafaultNullNumber
-//		then no number could be a choice
-//		It's wrong status
+	protected void removeCandidateNumber(int inputValue){
 		
 		if(Value != DafaultNullNumber) return;
+		if(inputValue == DafaultNullNumber) return;
 		
-		if(CandidateNumbers.size() == 1) setValue((int) CandidateNumbers.toArray()[0]);
-		else if(CandidateNumbers.size() == 0) Status.setWrongStatus(true);
-		
+		CandidateNumbers.remove(inputValue);
+				
 	}
-	public void setValue(int inputValue){
+	protected void setValue(int inputValue, boolean needUpdate){
 		
 		if(Value != DafaultNullNumber) {
 //			System.out.println("The value of this cell is not DafaultNullNumber!");
-//			Status.setFinishStatus(true);
+//			System.out.println("x: " + this.LocationX + " y: " + this.LocationY + " inputValue: " + inputValue);
 			return;
 		}
-		
 		Value = inputValue;
 		
 		if(inputValue == DafaultNullNumber) return; 
 		
 		CandidateNumbers.clear();
 		
-		for(int i = 0 ; i < 3 ; i++){
-			if(Status.getWrongStatus() == true) return;
-			UpdateParent.get(i).update(inputValue);
-		}
+		if(!needUpdate) return;
 		
-		CheckParent.check(inputValue);
+		for(int i = 0 ; i < 3 ; i++){
+			//if(Status.getWrongStatus()) return;
+			
+			UpdateParent.get(i).update(inputValue);
+
+		}
+
 	}
-	public int getValue(){
+	protected int getValue(){
 		return Value;
 	}
 	public String toString(){

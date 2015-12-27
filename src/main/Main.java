@@ -22,29 +22,48 @@ public class Main {
 		//Hardest problem in the world
 		String testString = "800000000003600000070090200050007000000045700000100030001000068008500010090000400";
 		
-		int TestTimes = 500;
+//		int TestTimes = 500;
+//		
+//		SudokuMap map[] = new SudokuMap[TestTimes];
+//		
+//		for(int i = 0 ; i < TestTimes ; i++){
+//			
+//			map[i] = new SudokuMap(testString);
+//			
+//		}
+//		
+//		boolean useThread = true;
+//		
+//		long StartTime = System.nanoTime();
+//		
+//		for(int i = 0 ; i < TestTimes ; i++){
+//			
+//			map[i].calculate(useThread);
+//			
+//		}
+//		
+//		long EndTime = System.nanoTime();
+//		map[0].show();
+//		System.out.println("Calculate + " + TestTimes + " times cost " + (EndTime - StartTime) / 1000000 + " micro sec");
 		
-		SudokuMap map[] = new SudokuMap[TestTimes];
+		SudokuMap map = new SudokuMap(testString);
 		
-		for(int i = 0 ; i < TestTimes ; i++){
-			
-			map[i] = new SudokuMap(testString);
-			
+		boolean useThread = false;
+		
+		map.show();
+		
+		map.calculate(useThread);
+		
+		if(map.isFinish()){
+			System.out.println("Calculate finish!");
 		}
-		
-		boolean useThread = true;
-		
-		long StartTime = System.nanoTime();
-		
-		for(int i = 0 ; i < TestTimes ; i++){
-			
-			map[i].calculate(useThread);
-			
+		else{
+			System.out.println("Calculate not finish!");
+			System.out.println("Something wrong!");
 		}
+		map.show();
 		
-		long EndTime = System.nanoTime();
-		map[0].show();
-		System.out.println("Calculate + " + TestTimes + " times cost " + (EndTime - StartTime) / 1000000 + " micro sec");
+		int result[] = map.getAnswer(); //Get the answer!
 	}
 
 }

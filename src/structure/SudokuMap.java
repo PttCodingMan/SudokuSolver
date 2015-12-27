@@ -399,6 +399,20 @@ public class SudokuMap implements checkParent,Runnable{
 	public int getErrorCode(){
 		return Status.getErrorCode();
 	}
+	public int[] getAnswer(){
+		if(!isFinish()) return null;
+		
+		int result[] = new int[81];
+		
+		for(int y = 0 ; y < 9 ; y++){
+			for(int x = 0 ; x < 9 ; x++){
+				
+				result[ 9 * y + x] = Cells[y][x].getValue();
+				
+			}
+		}
+		return result;
+	}
 	public void calculate(boolean inputUseThread){
 		
 		if(Status.getWrongStatus()) return;

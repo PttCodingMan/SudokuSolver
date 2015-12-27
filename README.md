@@ -4,22 +4,22 @@ It's pretty fast and easy to use.
 
 You can get a quickstart in the following code.
 
-    	String testString = "800000000003600000070090200050007000000045700000100030001000068008500010090000400";
-
-    	SudokuMap map = new SudokuMap(testString);
+	String testString = "800000000003600000070090200050007000000045700000100030001000068008500010090000400";
+	
+	SudokuMap map = new SudokuMap(testString);
 		
 	boolean useThread = false;
-		
+			
 	map.show();
-		
+			
 	map.calculate(useThread);
-		
+			
 	if(map.isFinish()){
-		System.out.println("Calculate finish!");
+	System.out.println("Calculate finish!");
 	}
 	else{
-		System.out.println("Calculate not finish!");
-		System.out.println("Something wrong!");
+	System.out.println("Calculate not finish!");
+	System.out.println("Something wrong!");
 	}
 	map.show();
 	

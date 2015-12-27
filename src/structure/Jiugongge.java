@@ -89,7 +89,7 @@ public class Jiugongge implements updateParent, checkParent{
 				
 				for(int y = 0 ; y < 3 ; y++){
 					for(int x = 0 ; x < 3 ; x++){
-						if(Cells[y][x].getCandidateNumberSet().contains(i)){
+						if(Cells[y][x].containsCandidateNumber(i)){
 							
 							Cells[y][x].setValue(i, true);
 							

@@ -2,7 +2,6 @@ package structure;
 
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Set;
 
 public class SudokuMap implements checkParent,Runnable{
 	private Cell Cells[][];
@@ -12,9 +11,6 @@ public class SudokuMap implements checkParent,Runnable{
 	private MapStatus Status;
 	
 	private String originData[];
-	
-	private int LastSetY;
-	private int LastSetX;
 	
 	private SudokuMap(SudokuMap OriginMap, MapStatus inputStatus){
 		Status = inputStatus;		
@@ -36,9 +32,6 @@ public class SudokuMap implements checkParent,Runnable{
 		originData = data;
 		
 		setDataToCell(true);
-		
-//		HashSet<Integer> TempCandidateNumbers[][] = getCandidateNumbers();
-//		setCandidateNumbers(TempCandidateNumbers);
 		
 	}
 	public SudokuMap(String inputData){
@@ -69,32 +62,32 @@ public class SudokuMap implements checkParent,Runnable{
 		}
 		originData = null;
 	}
-	private HashSet<Integer>[][] getCandidateNumbers(){
-		
-		HashSet<Integer> result[][] = new HashSet[9][9];
-		
-		for(int y = 0 ; y < 9 ; y++){
-			for(int x = 0 ; x < 9 ; x++ ){
-				
-				result[y][x] = Cells[y][x].getCandidateNumberSet();
-				
-			}
-		}
-		
-		return result;
-	}
-	
-	private void setCandidateNumbers(HashSet<Integer>[][] inputCandidateNumbers){
-		
-		for(int y = 0 ; y < 9 ; y++){
-			for(int x = 0 ; x < 9 ; x++ ){
-				
-				Cells[y][x].setCandidateNumberSet(inputCandidateNumbers[y][x]);
-				
-			}
-		}
-
-	}
+//	private HashSet<Integer>[][] getCandidateNumbers(){
+//		
+//		HashSet<Integer> result[][] = new HashSet[9][9];
+//		
+//		for(int y = 0 ; y < 9 ; y++){
+//			for(int x = 0 ; x < 9 ; x++ ){
+//				
+//				result[y][x] = Cells[y][x].getCandidateNumberSet();
+//				
+//			}
+//		}
+//		
+//		return result;
+//	}
+//	
+//	private void setCandidateNumbers(HashSet<Integer>[][] inputCandidateNumbers){
+//		
+//		for(int y = 0 ; y < 9 ; y++){
+//			for(int x = 0 ; x < 9 ; x++ ){
+//				
+//				Cells[y][x].setCandidateNumberSet(inputCandidateNumbers[y][x]);
+//				
+//			}
+//		}
+//
+//	}
 
 	private String[] processInputData(String inputData){
 		while(inputData.contains("  ")) inputData = inputData.replaceAll("  ", " ");
@@ -144,8 +137,9 @@ public class SudokuMap implements checkParent,Runnable{
 		Cells = new Cell[9][9];
 		for(int y = 0 ; y < 9 ; y++ ){
 			for(int x = 0 ; x < 9 ; x++ ){
-				Cells[y][x] = new Cell(Status, y, x);
-				Cells[y][x].setCheckParent(this);
+				
+				Cells[y][x] = new Cell(Status);
+				
 			}
 		}
 		
@@ -199,9 +193,7 @@ public class SudokuMap implements checkParent,Runnable{
 	}
 	
 	private void setCellValue(int y, int x, int inputValue, boolean needUpdate){
-		
-		LastSetY = y;
-		LastSetX = x;
+
 		Cells[y][x].setValue(inputValue, needUpdate);
 		
 	}
@@ -399,15 +391,15 @@ public class SudokuMap implements checkParent,Runnable{
 	public int getErrorCode(){
 		return Status.getErrorCode();
 	}
-	public int[] getAnswer(){
+	public int[][] getAnswer(){
 		if(!isFinish()) return null;
 		
-		int result[] = new int[81];
+		int result[][] = new int[9][9];
 		
 		for(int y = 0 ; y < 9 ; y++){
 			for(int x = 0 ; x < 9 ; x++){
 				
-				result[ 9 * y + x] = Cells[y][x].getValue();
+				result[y][x] = Integer.parseInt(originData[ 9 * y + x]);
 				
 			}
 		}

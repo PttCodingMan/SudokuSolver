@@ -15,11 +15,11 @@ You can get a quickstart in the following code.
 	map.calculate(useThread);
 			
 	if(map.isFinish()){
-	System.out.println("Calculate finish!");
+		System.out.println("Calculate finish!");
 	}
 	else{
-	System.out.println("Calculate not finish!");
-	System.out.println("Something wrong!");
+		System.out.println("Calculate not finish!");
+		System.out.println("Something wrong!");
 	}
 	map.show();
 	

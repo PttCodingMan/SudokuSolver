@@ -1,5 +1,8 @@
 package structure;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 
@@ -102,8 +105,24 @@ public class SudokuMap implements checkParent,Runnable{
 			data = inputData.split("");
 			
 		}
+		
+		ArrayList<String> dataArraylist = new ArrayList<String>(Arrays.asList(data));
+		
+		Iterator<String> dataItertor = dataArraylist.iterator();
+		while(dataItertor.hasNext()){
+			
+			String temp = dataItertor.next();
+			if(temp.length() == 0){
+				dataItertor.remove();
+			}
+		}
+		String [] newDataArray = new String[dataArraylist.size()]; 
+		newDataArray = (String[]) dataArraylist.toArray(newDataArray);
+		
+		data = newDataArray;
 		if(data.length != 81){
-			System.out.println("the input value can't translate to SudokuMap");
+			
+			System.out.println("the input value can't translate to SudokuMap " + data.length);
 			Status.setWrongStatus(ErrorCode.ValueLENNOT81);
 			return null;
 		}

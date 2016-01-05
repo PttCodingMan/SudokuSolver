@@ -14,40 +14,40 @@ public class SudokuMap implements checkParent,Runnable{
 	private Jiugongge Jiugongges[][];
 	private MapStatus Status;
 	
-	private String originData[];
+	private int originData[];
 	
 	private SudokuMap(SudokuMap OriginMap, MapStatus inputStatus){
 		Status = inputStatus;		
 		
-		String inputData = "";
+		int[] inputData = new int[81];
 		int values[][] = OriginMap.getValues();
 		for(int y = 0 ; y < 9 ; y++){
 			for(int x = 0 ; x < 9 ; x++){
-				inputData += values[y][x] + "";
+				inputData[y * 9 + x] = values[y][x];
 			}
 		}
-		
-		String data[] = processInputData(inputData);
-		
-		if(data == null || Status.getWrongStatus() ) return ;
+			
+		checkNumber(inputData);
+			
+		if(Status.getWrongStatus() ) return ;
 		
 		initStructure();
 		
-		originData = data;
+		originData = Arrays.copyOf(inputData, inputData.length);
 		
 		setDataToCell(true);
 		
 	}
-	public SudokuMap(String inputData){
+	public SudokuMap(int[] inputData){
 		Status = new MapStatus();
 		
-		String data[] = processInputData(inputData);
+		checkNumber(inputData);
 		
-		if(data == null || Status.getWrongStatus() ) return ;
+		if(Status.getWrongStatus() ) return ;
 		
 		initStructure();
 		
-		originData = data;
+		originData = Arrays.copyOf(inputData, inputData.length);
 
 	}
 	private void setDataToCell(boolean needUpdate){
@@ -55,7 +55,7 @@ public class SudokuMap implements checkParent,Runnable{
 		for(int y = 0 ; y < 9 ; y++){
 			for(int x = 0 ; x < 9 ; x++ ){
 				
-				setCellValue(y, x, Integer.parseInt(originData[ 9 * y + x]), needUpdate);
+				setCellValue(y, x, originData[ 9 * y + x], needUpdate);
 				
 				if(Status.getWrongStatus()) {
 					originData = null;
@@ -92,54 +92,14 @@ public class SudokuMap implements checkParent,Runnable{
 //		}
 //
 //	}
-
-	private String[] processInputData(String inputData){
-		while(inputData.contains("  ")) inputData = inputData.replaceAll("  ", " ");
-		while(inputData.contains("\n")) inputData = inputData.replaceAll("\n", "");
-		while(inputData.contains("\r")) inputData = inputData.replaceAll("\r", "");
-		
-		String data[] = inputData.split(" ");
-		
-		if(data.length == 1){
-			
-			data = inputData.split("");
-			
-		}
-		
-		ArrayList<String> dataArraylist = new ArrayList<String>(Arrays.asList(data));
-		
-		Iterator<String> dataItertor = dataArraylist.iterator();
-		while(dataItertor.hasNext()){
-			
-			String temp = dataItertor.next();
-			if(temp.length() == 0){
-				dataItertor.remove();
-			}
-		}
-		String [] newDataArray = new String[dataArraylist.size()]; 
-		newDataArray = (String[]) dataArraylist.toArray(newDataArray);
-		
-		data = newDataArray;
-		if(data.length != 81){
-			
-			System.out.println("the input value can't translate to SudokuMap " + data.length);
-			Status.setWrongStatus(ErrorCode.ValueLENNOT81);
-			return null;
-		}
-		checkNumber(data);
-		
-		if(Status.getWrongStatus()) return null;
-		
-		return data;
-	}
-	private void checkNumber(String[] inputData){
+	private void checkNumber(int[] inputData){
 		if(inputData.length != 81){
 			Status.setWrongStatus(ErrorCode.ValueLENNOT81);
 			return;
 		}
 		for(int i = 0 ; i < 81 ; i++ ){
 			try{
-				if( -1 > Integer.parseInt(inputData[i]) || Integer.parseInt(inputData[i]) > 9){
+				if( -1 > inputData[i] || inputData[i] > 9){
 					System.out.println("the values is not between 0~9");
 					Status.setWrongStatus(ErrorCode.ValueCouldNotbetween19);
 					return;
@@ -253,7 +213,7 @@ public class SudokuMap implements checkParent,Runnable{
 					TempValue = Cells[y][x].toString();
 				}
 				else{
-					TempValue = originData[ 9 * y + x].equals("0") ? "~" : originData[ 9 * y + x];
+					TempValue = originData[ 9 * y + x] == 0 ? "~" : originData[ 9 * y + x] + "";
 				}
 				
 				System.out.print(" " + TempValue + " ");
@@ -419,7 +379,7 @@ public class SudokuMap implements checkParent,Runnable{
 		for(int y = 0 ; y < 9 ; y++){
 			for(int x = 0 ; x < 9 ; x++){
 				
-				result[y][x] = Integer.parseInt(originData[ 9 * y + x]);
+				result[y][x] = originData[ 9 * y + x];
 				
 			}
 		}
@@ -439,12 +399,12 @@ public class SudokuMap implements checkParent,Runnable{
 		
 		if(Status.getFinishStatus()){
 
-			originData = new String[81];
+			originData = new int[81];
 			int CellTemp[][] = Status.getAnswer().getValues();
 			for(int y = 0 ; y < 9 ; y++){
 				for(int x = 0 ; x < 9 ; x++){
 					
-					originData[ 9 * y + x] = CellTemp[y][x] + "";
+					originData[ 9 * y + x] = CellTemp[y][x];
 					
 				}
 			}

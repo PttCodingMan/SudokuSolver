@@ -9,6 +9,14 @@ public class Main {
 		
 		String testString = "800000000003600000070090200050007000000045700000100030001000068008500010090000400";
 		
+		int inputData[] = new int[81];
+		
+		for(int i= 0 ; i < 81 ; i++){
+			
+			inputData[i] = Integer.parseInt(testString.split("")[i]);
+			
+		}
+		
 		/*Start of execution time test*/
 		
 		int TestTimes = 500;
@@ -17,7 +25,7 @@ public class Main {
 		
 		for(int i = 0 ; i < TestTimes ; i++){
 			
-			map[i] = new SudokuMap(testString);
+			map[i] = new SudokuMap(inputData);
 			
 		}
 		
@@ -32,12 +40,12 @@ public class Main {
 		}
 		
 		long EndTime = System.nanoTime();
-		map[0].show();
+		
 		System.out.println("Calculate " + TestTimes + " times cost " + (EndTime - StartTime) / 1000000 + " micro sec");
 		
 		/*End of execution time test*/
 		
-		SudokuMap TestMap = new SudokuMap(testString);
+		SudokuMap TestMap = new SudokuMap(inputData);
 		
 		useThread = false;
 		

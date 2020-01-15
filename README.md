@@ -1,6 +1,6 @@
 # Multi thread sudoku solver
 
-TruthSudokuSolver is Multithread sudoku solver library in java
+SudokuSolver is Multithread sudoku solver library in java
 
 It's pretty fast and easy to use.
 
